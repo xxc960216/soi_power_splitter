@@ -149,6 +149,55 @@ ic1.strt_bend_strt_p2p(pin1 = gc_list2[5].pin['a0'], pin2 = splitter2.pin['a1'])
 ic1.strt_bend_strt_p2p(pin1 = gc_list2[6].pin['a0'], pin2 = splitter2.pin['b1']).put()
 ic1.strt_bend_strt_p2p(pin1 = gc_list2[7].pin['a0'], pin2 = splitter2.pin['b0']).put()
 
+#placing row 2 elements
+row2_ini_pos = [230,350]
+row2_splitter1 = []
+row2_splitter2 = []
+cascade_splitter_count = 4
+#placing cascading splitters with 8.17um coupling length
+for kk in range(cascade_splitter_count):
+    row2_splitter1.append(splitter().put(row2_ini_pos[0]+kk*fiber_pitch,row2_ini_pos[1]))
+    ic1.strt_bend_strt_p2p(pin1 = row2_splitter1[kk].pin['b1'],pin2 = gc_list3[kk+1].pin['a0']).put()
+    wt.put(row2_splitter1[kk].pin['a1'])
+for kk in range (cascade_splitter_count-1):#connecting cascading splitters
+    ic1.strt_p2p(pin1 = row2_splitter1[kk],pin2 = row2_splitter1[kk+1].pin['a0']).put()
+ic1.strt_bend_strt_p2p(pin1 = gc_list3[0].pin['a0'], pin2 = row2_splitter1[0].pin['a0']).put()
+wt.put(row2_splitter1[cascade_splitter_count-1].pin['b0'])
+
+#placing cascading splitters with 7.83um coupling length
+for kk in range(cascade_splitter_count):#placing splitters and connecting to grating couplers
+    row2_splitter2.append(splitter(coupling_length=7.83).put(row2_ini_pos[0]+kk*fiber_pitch+5*fiber_pitch,row2_ini_pos[1]))
+    ic1.strt_bend_strt_p2p(pin1 = row2_splitter2[kk].pin['b1'],pin2 = gc_list3[kk+1+5].pin['a0']).put()
+    wt.put(row2_splitter2[kk].pin['a1'])
+for kk in range (cascade_splitter_count-1):#connecting cascading splitters
+    ic1.strt_p2p(pin1 = row2_splitter2[kk],pin2 = row2_splitter2[kk+1].pin['a0']).put()
+ic1.strt_bend_strt_p2p(pin1 = gc_list3[5].pin['a0'], pin2 = row2_splitter2[0].pin['a0']).put()
+wt.put(row2_splitter2[cascade_splitter_count-1].pin['b0'])
+
+#placing row 3 elements
+row3_ini_pos = [230,600]
+row3_splitter1 = []
+row3_splitter2 = []
+#placing cascading splitters with 8um coupling length
+for kk in range(cascade_splitter_count):
+    row3_splitter1.append(splitter(coupling_length=8).put(row3_ini_pos[0]+kk*fiber_pitch,row3_ini_pos[1]))
+    ic1.strt_bend_strt_p2p(pin1 = row3_splitter1[kk].pin['b1'],pin2 = gc_list4[kk+1].pin['a0']).put()
+    wt.put(row3_splitter1[kk].pin['a1'])
+for kk in range (cascade_splitter_count-1):#connecting cascading splitters
+    ic1.strt_p2p(pin1 = row3_splitter1[kk],pin2 = row3_splitter1[kk+1].pin['a0']).put()
+ic1.strt_bend_strt_p2p(pin1 = gc_list4[0].pin['a0'], pin2 = row3_splitter1[0].pin['a0']).put()
+wt.put(row3_splitter1[cascade_splitter_count-1].pin['b0'])
+
+#placing cascading splitters with 8.34um coupling length
+for kk in range(cascade_splitter_count):#placing splitters and connecting to grating couplers
+    row3_splitter2.append(splitter(coupling_length=8.34).put(row3_ini_pos[0]+kk*fiber_pitch+5*fiber_pitch,row3_ini_pos[1]))
+    ic1.strt_bend_strt_p2p(pin1 = row3_splitter2[kk].pin['b1'],pin2 = gc_list4[kk+1+5].pin['a0']).put()
+    wt.put(row3_splitter2[kk].pin['a1'])
+for kk in range (cascade_splitter_count-1):#connecting cascading splitters
+    ic1.strt_p2p(pin1 = row3_splitter2[kk],pin2 = row3_splitter2[kk+1].pin['a0']).put()
+ic1.strt_bend_strt_p2p(pin1 = gc_list4[5].pin['a0'], pin2 = row3_splitter2[0].pin['a0']).put()
+wt.put(row3_splitter2[cascade_splitter_count-1].pin['b0'])
+
 
 ### Part 5: text ###
 ####################
@@ -166,7 +215,10 @@ nd.text(text=text_insert5, height=10, layer=2, align='lb').put(insertion_connect
 nd.text(text="0.12/8.17um", height=10, layer=2, align='lb').put(230+fiber_pitch,50)
 nd.text(text="0.12/7.83um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,50)
 
-
+nd.text(text="0.12/8.17um", height=10, layer=2, align='lb').put(230,300)
+nd.text(text="0.12/7.83um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,300)
+nd.text(text="0.12/8um", height=10, layer=2, align='lb').put(230,550)
+nd.text(text="0.12/8.34um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,550)
 ### Part XX: export the GDS ###
 ###############################
 nd.export_gds(filename=file_name)

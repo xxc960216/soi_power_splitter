@@ -8,6 +8,7 @@ import nazca.demofab as demo
 
 #some variables
 fiber_pitch = 127
+row_y_gap = 800
 # clear layers
 nd.clear_layers()
 print("Running Nazca version " + nd.__version__)
@@ -31,8 +32,19 @@ nd.add_layer2xsection(xsection='xs1', layer='L1')
 ### Part 2: use pre-defined interconnects ###
 #############################################
 
-# create an interconnect object
-ic1 = nd.interconnects.Interconnect(xs='xs1')
+# Removing the pins
+nd.add_pinstyle('nopins', {
+  'shape': 'arrow_full',
+  'size': 0,
+  'layer': 'bb_pin',
+  'annotation_layer': 'bb_pin_text',
+  'annotation_move': (-0.3, 0),
+  'stub_length': 0,
+  'pin_ignore': []
+  })
+
+# create interconnect objects
+ic1 = nd.interconnects.Interconnect(xs='xs1',pinstyle='nopins') 
 ic1.radius = 20 #default bend radius
 ic1.width = 0.5 #default wire width
 
@@ -67,7 +79,7 @@ with nd.Cell('grating_coupler') as gc:
     swg_hole_width = 0.171
     dc_z = 0.55
     pitch_z = 0.81
-    taper_length = 20
+    taper_length = 500
     taper_final_width = number_of_swg_period*swg_pitch+(swg_pitch-swg_hole_width)
     taper = ic1.taper(length=taper_length, width2=taper_final_width).put()
     for kk in range(number_of_swg_period+1):
@@ -91,23 +103,23 @@ for kk in range(8):
     
 gc_list3  = []
 for kk in range(10):
-    gc_list3.append(gc.put(kk*fiber_pitch+200,250,-90))
+    gc_list3.append(gc.put(kk*fiber_pitch+200,row_y_gap,-90))
     
 gc_list4  = []
 for kk in range(10):
-    gc_list4.append(gc.put(kk*fiber_pitch+200,500,-90))
+    gc_list4.append(gc.put(kk*fiber_pitch+200,row_y_gap*2,-90))
     
 gc_list5  = []
 for kk in range(10):
-    gc_list5.append(gc.put(kk*fiber_pitch+200,750,-90))
+    gc_list5.append(gc.put(kk*fiber_pitch+1600,0,-90))
     
 gc_list6  = []
 for kk in range(10):
-    gc_list6.append(gc.put(kk*fiber_pitch+200,1000,-90))
+    gc_list6.append(gc.put(kk*fiber_pitch+1600,row_y_gap,-90))
     
 gc_list7  = []
 for kk in range(9):
-    gc_list7.append(gc.put(kk*fiber_pitch+200,1250,-90))
+    gc_list7.append(gc.put(kk*fiber_pitch+1600,row_y_gap*2,-90))
     
 #insertion loss test 1
 insertion_connect1 = ic1.strt(length=20).put(gc_list[0].pin['a0'])
@@ -150,7 +162,7 @@ ic1.strt_bend_strt_p2p(pin1 = gc_list2[6].pin['a0'], pin2 = splitter2.pin['b1'])
 ic1.strt_bend_strt_p2p(pin1 = gc_list2[7].pin['a0'], pin2 = splitter2.pin['b0']).put()
 
 #placing row 2 elements
-row2_ini_pos = [230,350]
+row2_ini_pos = [230,row1_ini_pos[1]+row_y_gap]
 row2_splitter1 = []
 row2_splitter2 = []
 cascade_splitter_count = 4
@@ -175,7 +187,7 @@ ic1.strt_bend_strt_p2p(pin1 = gc_list3[5].pin['a0'], pin2 = row2_splitter2[0].pi
 wt.put(row2_splitter2[cascade_splitter_count-1].pin['b0'])
 
 #placing row 3 elements
-row3_ini_pos = [230,600]
+row3_ini_pos = [230,row2_ini_pos[1]+row_y_gap]
 row3_splitter1 = []
 row3_splitter2 = []
 #placing cascading splitters with 8um coupling length
@@ -199,7 +211,7 @@ ic1.strt_bend_strt_p2p(pin1 = gc_list4[5].pin['a0'], pin2 = row3_splitter2[0].pi
 wt.put(row3_splitter2[cascade_splitter_count-1].pin['b0'])
 
 #placing row 4 elements
-row4_ini_pos = [230,850]
+row4_ini_pos = [230+1400,row1_ini_pos[1]]
 row4_splitter1 = []
 row4_splitter2 = []
 #placing cascading splitters with 8.51um coupling length
@@ -223,7 +235,7 @@ ic1.strt_bend_strt_p2p(pin1 = gc_list5[5].pin['a0'], pin2 = row4_splitter2[0].pi
 wt.put(row4_splitter2[cascade_splitter_count-1].pin['b0'])
 
 #placing row 5 elements
-row5_ini_pos = [230,1100]
+row5_ini_pos = [230+1400,row2_ini_pos[1]]
 row5_splitter1 = []
 row5_splitter2 = []
 #placing cascading splitters with 115nm gap
@@ -247,7 +259,7 @@ ic1.strt_bend_strt_p2p(pin1 = gc_list6[5].pin['a0'], pin2 = row5_splitter2[0].pi
 wt.put(row5_splitter2[cascade_splitter_count-1].pin['b0'])
 
 #placing row 6 elements
-row6_ini_pos = [230,1350]
+row6_ini_pos = [230+1400,row3_ini_pos[1]]
 row6_splitter1 = []
 row6_splitter2 = []
 #placing cascading splitters with 130nm gap
@@ -282,16 +294,16 @@ nd.text(text=text_insert5, height=10, layer=2, align='lb').put(insertion_connect
 nd.text(text="0.12/8.17um", height=10, layer=2, align='lb').put(230+fiber_pitch,50)
 nd.text(text="0.12/7.83um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,50)
 
-nd.text(text="0.12/8.17um", height=10, layer=2, align='lb').put(230,300)
-nd.text(text="0.12/7.83um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,300)
-nd.text(text="0.12/8um", height=10, layer=2, align='lb').put(230,550)
-nd.text(text="0.12/8.34um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,550)
-nd.text(text="0.12/8.51um", height=10, layer=2, align='lb').put(230,800)
-nd.text(text="0.11/8.17um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,800)
-nd.text(text="0.115/8.17um", height=10, layer=2, align='lb').put(230,1050)
-nd.text(text="0.125/8.17um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,1050)
-nd.text(text="0.13/8.17um", height=10, layer=2, align='lb').put(230,1300)
-nd.text(text="0.12/8um", height=10, layer=2, align='lb').put(230+6*fiber_pitch,1300)
+nd.text(text="0.12/8.17um", height=10, layer=2, align='lb').put(230,50+row_y_gap)
+nd.text(text="0.12/7.83um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,50+row_y_gap)
+nd.text(text="0.12/8um", height=10, layer=2, align='lb').put(230,50+row_y_gap*2)
+nd.text(text="0.12/8.34um", height=10, layer=2, align='lb').put(230+5*fiber_pitch,50+row_y_gap*2)
+nd.text(text="0.12/8.51um", height=10, layer=2, align='lb').put(230+1400,50)
+nd.text(text="0.11/8.17um", height=10, layer=2, align='lb').put(230+5*fiber_pitch+1400,50)
+nd.text(text="0.115/8.17um", height=10, layer=2, align='lb').put(230+1400,50+row_y_gap)
+nd.text(text="0.125/8.17um", height=10, layer=2, align='lb').put(230+5*fiber_pitch+1400,50+row_y_gap)
+nd.text(text="0.13/8.17um", height=10, layer=2, align='lb').put(230+1400,50+row_y_gap*2)
+nd.text(text="0.12/8um", height=10, layer=2, align='lb').put(230+6*fiber_pitch+1400,50+row_y_gap*2)
 ### Part XX: export the GDS ###
 ###############################
 nd.export_gds(filename=file_name)
